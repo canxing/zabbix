@@ -1178,7 +1178,7 @@ class CUser extends CApiService {
 
 		$sessionid = self::$userData['sessionid'];
 
-		$db_sessions = DB::select('sessions', [
+		$db_sessions = DB::select('view_sessions', [
 			'output' => ['userid'],
 			'filter' => [
 				'sessionid' => $sessionid,
@@ -1380,7 +1380,7 @@ class CUser extends CApiService {
 
 		$time = time();
 
-		$db_sessions = DB::select('sessions', [
+		$db_sessions = DB::select('view_sessions', [
 			'output' => ['userid', 'lastaccess'],
 			'sessionids' => $sessionid,
 			'filter' => ['status' => ZBX_SESSION_ACTIVE]
