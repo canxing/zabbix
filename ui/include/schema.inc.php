@@ -6360,7 +6360,7 @@ return [
 			'sessionid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 32,
+				'length' => 256,
 				'default' => ''
 			],
 			'userid' => [

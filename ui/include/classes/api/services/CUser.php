@@ -1178,10 +1178,10 @@ class CUser extends CApiService {
 
 		$sessionid = self::$userData['sessionid'];
 
-		$db_sessions = DB::select('view_sessions', [
+		$db_sessions = DB::select('sessions', [
 			'output' => ['userid'],
 			'filter' => [
-				'sessionid' => $sessionid,
+				'sessionid' => hash("sha256", $sessionid),
 				'status' => ZBX_SESSION_ACTIVE
 			],
 			'limit' => 1
@@ -1197,7 +1197,7 @@ class CUser extends CApiService {
 		]);
 		DB::update('sessions', [
 			'values' => ['status' => ZBX_SESSION_PASSIVE],
-			'where' => ['sessionid' => $sessionid]
+			'where' => ['sessionid' => hash("sha256", $sessionid)]
 		]);
 
 		$this->addAuditDetails(AUDIT_ACTION_LOGOUT, AUDIT_RESOURCE_USER);
@@ -1380,9 +1380,9 @@ class CUser extends CApiService {
 
 		$time = time();
 
-		$db_sessions = DB::select('view_sessions', [
+		$db_sessions = DB::select('sessions', [
 			'output' => ['userid', 'lastaccess'],
-			'sessionids' => $sessionid,
+			'sessionids' => hash("sha256", $sessionid),
 			'filter' => ['status' => ZBX_SESSION_ACTIVE]
 		]);
 
@@ -1423,7 +1423,7 @@ class CUser extends CApiService {
 			]);
 			DB::update('sessions', [
 				'values' => ['status' => ZBX_SESSION_PASSIVE],
-				'where' => ['sessionid' => $sessionid]
+				'where' => ['sessionid' => hash("sha256", $sessionid)]
 			]);
 
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Session terminated, re-login, please.'));
@@ -1432,7 +1432,7 @@ class CUser extends CApiService {
 		if ($session['extend'] && $time != $db_session['lastaccess']) {
 			DB::update('sessions', [
 				'values' => ['lastaccess' => $time],
-				'where' => ['sessionid' => $sessionid]
+				'where' => ['sessionid' => hash("sha256", $sessionid)]
 			]);
 		}
 
@@ -1557,7 +1557,7 @@ class CUser extends CApiService {
 		$db_user['sessionid'] = md5(microtime().$alias.mt_rand());
 
 		DB::insert('sessions', [[
-			'sessionid' => $db_user['sessionid'],
+			'sessionid' => hash("sha256", $db_user['sessionid']),
 			'userid' => $db_user['userid'],
 			'lastaccess' => time(),
 			'status' => ZBX_SESSION_ACTIVE
